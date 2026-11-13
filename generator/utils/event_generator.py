@@ -1,6 +1,7 @@
 
 import random
 import time
+import json
 
 
 PRODUCTS = {
@@ -46,3 +47,35 @@ def generate_hot_key(event_number: int) -> dict:
         event["product_id"] = "PROD-102"
         event["product"] = "Airpods"
         event["price"] = 179.99
+
+
+def generate_late_events(event_number:int ) -> dict:
+    event = generate(event_number=event_number)
+    curr = time.time_ns() // 1_000_000
+
+    if random.random() < 0.30:
+        delay = random.randint(6,10) * 1000
+        event["event_timestamp"] = curr - delay
+
+    return event
+
+def generate_malform_events(event_number:int, event_type:str) -> dict:
+
+    
+    if event_type == "invalid_json":
+        event = generate(event_number=event_number)
+        payload = json.dumps(event)[::-1].encode("utf-8")
+    else:
+        if event_type == "missing_fields":
+            event.pop("product",None)
+        elif event_type == "wrong_data_type":
+            event["price"] = "free bro"
+        elif event_type == "invalid_values":
+            event["quantity"] = -10
+        elif event_type == "invalid_timestamp":
+            event["event_timestamp"] = "bro invalid value"
+
+        payload = json.dumps(event).encode("utf-8")
+
+    return event,payload
+

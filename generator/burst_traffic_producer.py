@@ -63,10 +63,10 @@ def burst_traffic_production():
                     producer.poll(0.1)
             producer.poll(0)
 
-    remaining_orders = producer.flush()
+    remaining_orders = producer.flush(30)
     total_time = time.perf_counter() - start_time
 
-    print("\n###### Normal Production Results ######")
+    print("\n###### Burst Traffic Production Results ######")
     print(f"Scheduled events: {event_number}")
     print(f"Target rate: {rate} events/sec")
     print(f"Delivered: {stats['delivered']}")

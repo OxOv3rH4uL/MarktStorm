@@ -47,7 +47,7 @@ def normal_production():
                 producer.poll(0.1)
         producer.poll(0)
 
-    remaining_orders = producer.flush()
+    remaining_orders = producer.flush(30)
     total_time = time.perf_counter() - start_time
 
     print("\n###### Normal Production Results ######")

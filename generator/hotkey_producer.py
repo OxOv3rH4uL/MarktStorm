@@ -2,7 +2,7 @@ import json
 import time
 
 from confluent_kafka import Producer
-from utils.event_generator import generate
+from utils.event_generator import generate, generate_hot_key
 import random
 
 stats = {
@@ -33,7 +33,7 @@ def hotkey_production():
             time.sleep(
                 max(0,min(target_time-time.perf_counter(),0.001))
             )
-        event = generate(i+1)
+        event = generate_hot_key(i+1)
         key = event["product_id"]
         payload = json.dumps(event).encode("utf-8")
         while True:
@@ -49,7 +49,7 @@ def hotkey_production():
                 producer.poll(0.1)
         producer.poll(0)
 
-    remaining_orders = producer.flush()
+    remaining_orders = producer.flush(30)
     total_time = time.perf_counter() - start_time
 
     print("\n###### Hot-Key Experiment Results ######")
