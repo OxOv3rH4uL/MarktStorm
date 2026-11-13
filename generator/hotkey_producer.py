@@ -21,7 +21,7 @@ def hotkey_production():
     random.seed(42)
     producer = Producer({
         "bootstrap.servers": "localhost:9094",
-        "client.id" : "marktstorm-normal-production-generator",
+        "client.id" : "marktstorm-hotkey-production-generator",
         "acks": "all"
     })
     start_time = time.perf_counter()
@@ -34,7 +34,7 @@ def hotkey_production():
                 max(0,min(target_time-time.perf_counter(),0.001))
             )
         event = generate(i+1)
-        key = event["user_id"]
+        key = event["product_id"]
         payload = json.dumps(event).encode("utf-8")
         while True:
             try:
@@ -52,7 +52,7 @@ def hotkey_production():
     remaining_orders = producer.flush()
     total_time = time.perf_counter() - start_time
 
-    print("\n--- Hot-Key Experiment Results ---")
+    print("\n###### Hot-Key Experiment Results ######")
     print(f"Total events: {events}")
     print(f"Delivered: {stats['delivered']}")
     print(f"Failed: {stats['failed']}")

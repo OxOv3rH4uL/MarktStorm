@@ -50,7 +50,7 @@ def normal_production():
     remaining_orders = producer.flush()
     total_time = time.perf_counter() - start_time
 
-    print("\n--- Normal Production Results ---")
+    print("\n###### Normal Production Results ######")
     print(f"Scheduled events: {events}")
     print(f"Target rate: {rate} events/sec")
     print(f"Delivered: {stats['delivered']}")
