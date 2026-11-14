@@ -1,0 +1,15 @@
+com\marktstorm\MarktstormJob.class
+com\marktstorm\model\ProductAccumulator.class
+com\marktstorm\model\DeadLetter.class
+com\marktstorm\functions\ProductAggregator.class
+com\marktstorm\functions\WindowResultProductFunction.class
+com\marktstorm\functions\WindowResultOrdersFunction.class
+com\marktstorm\model\ProductAggregationResult.class
+com\marktstorm\model\OrderAggregationResult.class
+com\marktstorm\model\Order.class
+com\marktstorm\processor\OrderValidation$1.class
+com\marktstorm\sink\KafkaSinkFactory.class
+com\marktstorm\functions\UserAggregator.class
+com\marktstorm\functions\OrderAggregator.class
+com\marktstorm\model\OrderAccumulator.class
+com\marktstorm\processor\OrderValidation.class

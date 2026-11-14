@@ -1,6 +1,6 @@
 package com.marktstorm.model;
 import java.io.Serializable;
-public class ProductAggregationResult {
+public class ProductAggregationResult implements Serializable {
     public String groupType;
     public String groupKey;
     public long orderCount;
@@ -12,7 +12,7 @@ public class ProductAggregationResult {
     public long windowEnd;
 
     public ProductAggregationResult(){
-        
+
     }
 }
 

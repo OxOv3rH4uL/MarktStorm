@@ -45,10 +45,11 @@ public class MarktstormJob{
         DataStream<Order> timeStampedOrders = validOrders.assignTimestampsAndWatermarks(
             WatermarkStrategy.<Order>forBoundedOutOfOrderness(Duration.ofSeconds(5))
                 .withTimestampAssigner((order,timestamp) -> order.event_timestamp)
+                .withIdleness(Duration.ofSeconds(10))
         );
 
         DataStream<OrderAggregationResult> orderResult = timeStampedOrders
-            .keyBy(order -> order.order_id)
+            .keyBy(order -> "ALL_ORDERS")
             .window(TumblingEventTimeWindows.of(Time.seconds(10)))
             .aggregate(new OrderAggregator(), new WindowResultOrdersFunction("orders"));
         
@@ -75,12 +76,6 @@ public class MarktstormJob{
             KafkaSinkFactory.create("dead-letter")
         );
 
-        
-
-        
-
-        
-
-
+        env.execute("Marktstorm Job");
     }
 }
