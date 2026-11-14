@@ -17,6 +17,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.marktstorm.model.Order;
 import com.marktstorm.model.DeadLetter;
 import com.marktstorm.processor.OrderValidation;
+import com.marktstorm.functions.OrderAggregator;
+import com.marktstorm.functions.ProductAggregator;
+import com.marktstorm.functions.WindowResultOrdersFunction;
+import com.marktstorm.functions.WindowResultProductFunction;
+import com.marktstorm.model.OrderAggregationResult;
+import com.marktstorm.model.OrderAccumulator;
+import com.marktstorm.model.ProductAccumulator;
+import com.marktstorm.model.ProductAggregationResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.Serializable;
@@ -45,7 +53,19 @@ public class MarktstormJob{
             WatermarkStrategy.<Order>forBoundedOutOfOrderness(Duration.ofSeconds(5))
                 .withTimestampAssigner((order,timestamp) -> order.event_timestamp)
         );
+
+        DataStream<OrderAggregationResult> orderResult = timeStampedOrders
+            .keyBy(order -> order.order_id)
+            .window(TumblingEventTimeWindows.of(Time.seconds(10)))
+            .aggregate(new OrderAggregator(), new WindowResultOrdersFunction("orders"));
         
+        DataStream<ProductAggregationResult> productResult = timeStampedOrders
+            .keyBy(order -> order.product_id)
+            .window(TumblingEventTimeWindows.of(Time.seconds(10)))
+            .aggregate(new ProductAggregator(), new WindowResultProductFunction("product"));
+
+        
+
         
 
 
