@@ -1,19 +1,13 @@
 package com.marktstorm;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
-import org.apache.flink.connector.kafka.sink.KafkaSink;
-import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
-import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.connector.base.DeliveryGuarantee;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.marktstorm.model.Order;
 import com.marktstorm.model.DeadLetter;
 import com.marktstorm.processor.OrderValidation;
@@ -25,8 +19,7 @@ import com.marktstorm.model.OrderAggregationResult;
 import com.marktstorm.model.OrderAccumulator;
 import com.marktstorm.model.ProductAccumulator;
 import com.marktstorm.model.ProductAggregationResult;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.marktstorm.sink.KafkaSinkFactory;
 import java.io.Serializable;
 import java.time.Duration;
 
@@ -63,6 +56,26 @@ public class MarktstormJob{
             .keyBy(order -> order.product_id)
             .window(TumblingEventTimeWindows.of(Time.seconds(10)))
             .aggregate(new ProductAggregator(), new WindowResultProductFunction("product"));
+        
+        DataStream<OrderAggregationResult> userResult = timeStampedOrders
+            .keyBy(order-> order.user_id)
+            .window(TumblingEventTimeWindows.of(Time.seconds(10)))
+            .aggregate(new OrderAggregator(), new WindowResultOrdersFunction("user"));
+        
+        orderResult.sinkTo(
+            KafkaSinkFactory.create("order-aggregation")
+        );
+        productResult.sinkTo(
+            KafkaSinkFactory.create("product-aggregation")
+        );
+        userResult.sinkTo(
+            KafkaSinkFactory.create("user-aggregation")
+        );
+        invalidOrders.sinkTo(
+            KafkaSinkFactory.create("dead-letter")
+        );
+
+        
 
         
 
