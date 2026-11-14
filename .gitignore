@@ -2,3 +2,4 @@
 .vscode
 .metals
 __pycache__
+target/
