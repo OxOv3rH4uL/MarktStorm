@@ -127,5 +127,35 @@ class DuckDBWriter:
         except Exception:
             raise 
 
+    def insert_dead_letter(self, dl, topic, partition, offset):
+        message_key = f"{topic}-{partition}-{offset}"
+        rid = int.from_bytes(
+            hashlib.sha256(message_key.encode()).digest()[:8],
+            byteorder="big"
+        ) & 0x7FFFFFFFFFFFFFFF
+
+        try:
+            self.conn.execute(
+                """
+                INSERT INTO dead_letter(
+                    id,
+                    message,
+                    error,
+                    rejectedAt
+                    )
+                VALUES(?,?,?,?)
+                ON CONFLICT(id) DO NOTHING
+                """,
+                [
+                    rid,
+                    dl["message"],
+                    dl["error"],
+                    dl["rejectedAt"]
+                ]
+            )
+        except Exception:
+            raise
+
+
     def close(self):
         self.conn.close()
