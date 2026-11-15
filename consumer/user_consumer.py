@@ -3,14 +3,14 @@ from confluent_kafka import Consumer, KafkaException
 
 consumer_config = {
     "bootstrap.servers" : "localhost:9094",
-    "group.id" : "marktstorm-product-consumers",
+    "group.id" : "marktstorm-user-consumers",
     "auto.offset.reset" : "earliest",
     "enable.auto.commit" : False 
 }
 
 consumer = Consumer(consumer_config)
 
-consumer.subscribe(["product-aggregation"])
+consumer.subscribe(["user-aggregation"])
 
 try:
     while True:
