@@ -90,7 +90,7 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
       - ./infra/grafana/plugins:/var/lib/grafana/plugins
-      - ./database:/var/lib/grafana/duckdb
+      - grafana_snapshot:/var/lib/grafana/duckdb
     depends_on:
       - prometheus
 
@@ -99,4 +99,5 @@ volumes:
   kafka_data:
   prometheus_data:
   grafana_data:
+  grafana_snapshot:
 

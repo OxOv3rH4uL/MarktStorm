@@ -3,6 +3,7 @@ from pathlib import Path
 import hashlib
 import duckdb
 import os
+import subprocess
 
 DB_PATH = Path(r"C:\Users\91994\OneDrive\Desktop\MarktStorm\database\marktstorm.duckdb")
 
@@ -10,9 +11,11 @@ class DuckDBWriter:
     def __init__(self):
         self.conn = duckdb.connect(str(DB_PATH))
 
+
     def create_snapshot(self):
-        snapshot_path = str(DB_PATH.parent/ "marktstorm-snapshot.duckdb")
+
         temp_path = DB_PATH.parent / "marktstorm-snapshot-tmp.duckdb"
+
         source_db = self.conn.execute(
             "SELECT current_database()"
         ).fetchone()[0]
@@ -31,11 +34,26 @@ class DuckDBWriter:
         try:
             self.conn.execute(f"""
                 COPY FROM DATABASE "{source_name}" TO grafana_tmp
-        """)
+            """)
         finally:
             self.conn.execute("DETACH grafana_tmp")
 
-        os.replace(temp_path,snapshot_path)
+        subprocess.run([
+            "docker", "cp",
+            str(temp_path),
+            "grafana:/var/lib/grafana/duckdb/marktstorm-snapshot-tmp.duckdb"
+        ], check=True)
+
+        subprocess.run([
+            "docker", "exec", "grafana",
+            "mv", "-f",
+            "/var/lib/grafana/duckdb/marktstorm-snapshot-tmp.duckdb",
+            "/var/lib/grafana/duckdb/marktstorm-snapshot.duckdb"
+        ], check=True)
+
+        temp_path.unlink()
+
+
 
         
 

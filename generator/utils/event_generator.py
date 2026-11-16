@@ -47,6 +47,7 @@ def generate_hot_key(event_number: int) -> dict:
         event["product_id"] = "PROD-102"
         event["product"] = "Airpods"
         event["price"] = 179.99
+    return event
 
 
 def generate_late_events(event_number:int ) -> dict:
