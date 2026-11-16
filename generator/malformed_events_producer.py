@@ -42,7 +42,7 @@ def malformed_events_production():
     
     start_time = time.perf_counter()
 
-    for event_type, i in enumerate(event_types,start=1):
+    for i , event_type in enumerate(event_types,start=1):
         target_time = start_time + ((i-1)/rate)
         while time.perf_counter() < target_time:
             time.sleep(

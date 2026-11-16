@@ -86,6 +86,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+      - GF_SECURITY_ALLOW_EMBEDDING=true
       - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=motherduck-duckdb-datasource
     volumes:
       - grafana_data:/var/lib/grafana

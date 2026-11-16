@@ -63,8 +63,8 @@ def generate_late_events(event_number:int ) -> dict:
 def generate_malform_events(event_number:int, event_type:str) -> dict:
 
     
+    event = generate(event_number=event_number)
     if event_type == "invalid_json":
-        event = generate(event_number=event_number)
         payload = json.dumps(event)[::-1].encode("utf-8")
     else:
         if event_type == "missing_fields":
