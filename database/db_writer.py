@@ -5,7 +5,7 @@ import duckdb
 import os
 
 DB_PATH = Path(r"C:\Users\91994\OneDrive\Desktop\MarktStorm\database\marktstorm.duckdb")
-GRAFANA_DB_PATH = DB_PATH.parent / "marktstorm_grafana.duckdb"
+
 class DuckDBWriter:
     def __init__(self):
         self.conn = duckdb.connect(str(DB_PATH))
