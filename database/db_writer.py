@@ -24,7 +24,7 @@ class DuckDBWriter:
         source_name = source_db.replace('"', '""')
 
         self.conn.execute(
-            f"ATTACH '{temp_sql_path} AS grafana_tmp "
+            f"ATTACH '{temp_sql_path}' AS grafana_tmp "
             "(STORAGE_VERSION 'v1.5.0')"
         )
 

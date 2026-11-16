@@ -81,12 +81,16 @@ services:
 
 
   grafana:
-    image: grafana/grafana:11.5.2
+    image: grafana/grafana:11.5.2-ubuntu
     container_name: grafana
     ports:
       - "3000:3000"
+    environment:
+      - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=motherduck-duckdb-datasource
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./infra/grafana/plugins:/var/lib/grafana/plugins
+      - ./database:/var/lib/grafana/duckdb
     depends_on:
       - prometheus
 

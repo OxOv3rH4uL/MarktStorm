@@ -2,7 +2,7 @@ import json
 from confluent_kafka import Consumer, KafkaException
 import asyncio
 
-async def dead_letter_consumer(message_queue):
+async def get_dead_letter_consumer(message_queue):
     consumer_config = {
         "bootstrap.servers" : "localhost:9094",
         "group.id" : "marktstorm-dead-letter-consumers",

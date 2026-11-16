@@ -33,7 +33,7 @@ def generate(event_number: int) -> dict:
         "product_id": product_id,
         "product": product,
         "category": category,
-        "quantity": random.randint(1, 10),
+        "quantity": random.randint(1, 5),
         "price": price,
         "event_timestamp": time.time_ns() // 1_000_000
     }

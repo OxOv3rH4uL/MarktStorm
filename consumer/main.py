@@ -1,10 +1,9 @@
 import asyncio
-from consumer.order_consumer import order_consumer
-from consumer.product_consumer import product_consumer
-from consumer.user_consumer import user_consumer
-from consumer.dead_letter_consumer import dead_letter_consumer
+from .order_consumer import get_order_consumer
+from .product_consumer import get_product_consumer
+from .user_consumer import get_user_consumer
+from .dead_letter_consumer import get_dead_letter_consumer
 from concurrent.futures import ThreadPoolExecutor
-
 from database.db_writer import DuckDBWriter
 
 
@@ -46,6 +45,18 @@ async def writerz(message_queue, writer, executor):
 
 
 
+async def snapshot_scheduler(writer,executor):
+    loop = asyncio.get_running_loop()
+
+    while True:
+        await asyncio.sleep(10)
+
+        await loop.run_in_executor(
+            executor,
+            writer.create_snapshot
+        )
+
+
 
 
 async def main():
@@ -60,18 +71,19 @@ async def main():
         writerz(message_queue,writer,executor)
     )
     
-    consumers = [
-        order_consumer(message_queue),
-        product_consumer(message_queue),
-        user_consumer(message_queue),
-        dead_letter_consumer(message_queue)
+    consumers_scheduler = [
+        get_order_consumer(message_queue),
+        get_product_consumer(message_queue),
+        get_user_consumer(message_queue),
+        get_dead_letter_consumer(message_queue),
+        snapshot_scheduler(writer,executor)
     ]
     try:
         await asyncio.gather(
-            *consumers
+            *consumers_scheduler
         )
-    except:
-        print("Something is wrong")
+    except Exception as e:
+        print(e)
 
 if __name__ == "__main__":
     asyncio.run(main())

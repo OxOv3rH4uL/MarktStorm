@@ -3,7 +3,7 @@ from confluent_kafka import Consumer, KafkaException
 import asyncio
 
 
-async def product_consumer(message_queue):
+async def get_product_consumer(message_queue):
     consumer_config = {
         "bootstrap.servers" : "localhost:9094",
         "group.id" : "marktstorm-product-consumers",
@@ -41,8 +41,8 @@ async def product_consumer(message_queue):
 
                 consumer.commit(message = msg, asynchronous=False)
 
-            except:
-                print("Invalid Messages Incoming. Should Check Dead Letter Producer")
+            except Exception as e:
+                print(e)
     except asyncio.CancelledError:
         print("Stopping consumer")
 

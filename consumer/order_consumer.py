@@ -4,7 +4,7 @@ import asyncio
 
 
 
-async def order_consumer(message_queue):
+async def get_order_consumer(message_queue):
     consumer_config = {
         "bootstrap.servers" : "localhost:9094",
         "group.id" : "marktstorm-order-consumers",
@@ -47,8 +47,8 @@ async def order_consumer(message_queue):
                     asynchronous=False
                 )
                 
-            except:
-                print("Invalid Messages Incoming. Should Check Dead Letter Producer")
+            except Exception as e:
+                print(e)
     except asyncio.CancelledError:
         print("Stopping consumer")
         raise
