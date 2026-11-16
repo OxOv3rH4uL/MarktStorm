@@ -2,12 +2,45 @@ import uuid
 from pathlib import Path
 import hashlib
 import duckdb
+import os
 
 DB_PATH = Path(r"C:\Users\91994\OneDrive\Desktop\MarktStorm\database\marktstorm.duckdb")
-
+GRAFANA_DB_PATH = DB_PATH.parent / "marktstorm_grafana.duckdb"
 class DuckDBWriter:
     def __init__(self):
         self.conn = duckdb.connect(str(DB_PATH))
+
+    def create_snapshot(self):
+        snapshot_path = str(DB_PATH.parent/ "marktstorm-snapshot.duckdb")
+        temp_path = DB_PATH.parent / "marktstorm-snapshot-tmp.duckdb"
+        source_db = self.conn.execute(
+            "SELECT current_database()"
+        ).fetchone()[0]
+
+        if temp_path.exists():
+            temp_path.unlink()
+
+        temp_sql_path = temp_path.as_posix().replace("'", "''")
+        source_name = source_db.replace('"', '""')
+
+        self.conn.execute(
+            f"ATTACH '{temp_sql_path} AS grafana_tmp "
+            "(STORAGE_VERSION 'v1.5.0')"
+        )
+
+        try:
+            self.conn.execute(f"""
+                COPY FROM DATABASE "{source_name}" TO grafana_tmp
+        """)
+        finally:
+            self.conn.execute("DETACH grafana_tmp")
+
+        os.replace(temp_path,snapshot_path)
+
+        
+
+
+
 
     def insert_order_metrics(self, order, topic, partition, offset):
         message_key = f"{topic}-{partition}-{offset}"
@@ -159,3 +192,4 @@ class DuckDBWriter:
 
     def close(self):
         self.conn.close()
+
